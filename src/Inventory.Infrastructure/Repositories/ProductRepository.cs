@@ -1,0 +1,51 @@
+using Dapper;
+using Inventory.Application.Interfaces;
+using Inventory.Domain.Entities;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Configuration;
+
+namespace Inventory.Infrastructure.Repositories;
+
+public class ProductRepository : IProductRepository
+{
+    private readonly IConfiguration _configuration;
+
+    public ProductRepository(IConfiguration configuration)
+    {
+        _configuration = configuration;
+    }
+
+    public async Task<Product> CreateAsync(Product product)
+    {
+        const string sql = """
+            INSERT INTO Products
+            (
+                Id,
+                Name,
+                Description,
+                Price,
+                Stock,
+                CategoryId,
+                CreatedAtUtc
+            )
+            VALUES
+            (
+                @Id,
+                @Name,
+                @Description,
+                @Price,
+                @Stock,
+                @CategoryId,
+                @CreatedAtUtc
+            )
+            """;
+
+        using var connection = new SqlConnection(
+            _configuration.GetConnectionString("DefaultConnection"));
+        product.Id = Guid.NewGuid();
+        product.CreatedAtUtc = DateTime.UtcNow;
+        await connection.ExecuteAsync(sql, product);
+
+        return product;
+    }
+}
