@@ -48,4 +48,44 @@ public class ProductRepository : IProductRepository
 
         return product;
     }
+
+    public async Task<bool> UpdateAsync(Product product)
+    {
+        const string sql = """
+            UPDATE Products
+            SET
+                Name = @Name,
+                Description = @Description,
+                Price = @Price,
+                Stock = @Stock,
+                CategoryId = @CategoryId
+            WHERE Id = @Id
+            """;
+
+        using var connection = new SqlConnection(
+            _configuration.GetConnectionString("DefaultConnection"));
+
+        var rowsAffected = await connection.ExecuteAsync(
+            sql,
+            product);
+
+        return rowsAffected > 0;
+    }
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        const string sql = """
+            DELETE FROM Products
+            WHERE Id = @Id
+            """;
+
+        using var connection = new SqlConnection(
+            _configuration.GetConnectionString("DefaultConnection"));
+
+        var rowsAffected = await connection.ExecuteAsync(
+            sql,
+            new { Id = id });
+
+        return rowsAffected > 0;
+    }
 }
