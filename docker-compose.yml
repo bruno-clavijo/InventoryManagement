@@ -1,0 +1,40 @@
+version: "3.9"
+
+services:
+  inventory.api:
+    container_name: inventory.api
+    build:
+      context: .
+      dockerfile: src/Inventory.Api/Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+
+      ConnectionStrings__DefaultConnection: >
+        Server=inventory.sqlserver;
+        Database=InventoryDb;
+        User Id=sa;
+        Password=InventoryDbPassword123*;
+        TrustServerCertificate=True;
+
+      Jwt__Key: >
+        InventoryManagementApiSuperSecretJwtKey2026!
+
+      Jwt__Issuer: InventoryApi
+
+      Jwt__Audience: InventoryApiUsers
+
+      Jwt__DurationInMinutes: 60
+
+    depends_on:
+      - inventory.sqlserver
+
+  inventory.sqlserver:
+    container_name: inventory.sqlserver
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "InventoryDbPassword123*"
+    ports:
+      - "1434:1433"

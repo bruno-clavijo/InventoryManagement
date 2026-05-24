@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using Microsoft.OpenApi.Models;
+using Inventory.Infrastructure.Persistence.Contexts;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,5 +99,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 //app.UseHttpsRedirection();
+
+using var scope = app.Services.CreateScope();
+
+var dbContext =
+    scope.ServiceProvider
+        .GetRequiredService<AppDbContext>();
+
+dbContext.Database.Migrate();
 
 app.Run();
