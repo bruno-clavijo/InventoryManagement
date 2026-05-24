@@ -124,25 +124,19 @@ src/Inventory.Api/appsettings.json
 }
 ```
 
-### Docker SQL Server Example
-
-```json
-"ConnectionStrings": {
-  "DefaultConnection": "Server=inventory.sqlserver;Database=InventoryDb;User Id=sa;Password=InventoryDbPassword123*;TrustServerCertificate=True"
-}
-```
-
-### 4. Apply migrations
+### 4. Restore packages
 
 ```bash
-dotnet ef database update \
---project ./src/Inventory.Infrastructure \
---startup-project ./src/Inventory.Api
+dotnet restore
 ```
 
----
+### 5. Apply migrations
 
-### 5. Run API
+```bash
+dotnet ef database update --project ./src/Inventory.Infrastructure --startup-project ./src/Inventory.Api
+```
+
+### 6. Run API
 
 ```bash
 dotnet run --project ./src/Inventory.Api
@@ -191,7 +185,19 @@ dotnet test
 
 ## Run With Docker
 
-### Build and run containers
+### 1. Clone repository
+
+```bash
+git clone https://github.com/bruno-clavijo/InventoryManagement.git
+```
+
+### 2. Navigate to project
+
+```bash
+cd InventoryManagement
+```
+
+### 3. Build and run containers
 
 ```bash
 docker compose up --build
@@ -199,7 +205,7 @@ docker compose up --build
 
 ---
 
-### Docker Swagger URL
+### 4. Docker Swagger URL
 
 ```txt
 http://localhost:8080/swagger
@@ -229,6 +235,14 @@ sa
 
 ```txt
 InventoryDbPassword123*
+```
+
+### Docker SQL Server Example
+
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=inventory.sqlserver;Database=InventoryDb;User Id=sa;Password=InventoryDbPassword123*;TrustServerCertificate=True"
+}
 ```
 
 ---
