@@ -61,7 +61,7 @@ namespace Inventory.Infrastructure.Persistence.Migrations
                     b.Property<DateTime>("CreatedAtUtc")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("MovementType")
+                    b.Property<int>("Type")
                         .HasColumnType("int");
 
                     b.Property<Guid>("ProductId")

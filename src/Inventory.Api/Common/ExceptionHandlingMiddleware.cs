@@ -1,4 +1,5 @@
 using FluentValidation;
+using Inventory.Application.Common.Exceptions;
 using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Text.Json;
@@ -37,6 +38,16 @@ public class ExceptionHandlingMiddleware
 
             await context.Response.WriteAsync(
                 JsonSerializer.Serialize(response));
+        }
+        catch (BusinessException exception)
+        {
+            context.Response.StatusCode = 400;
+
+            await context.Response.WriteAsJsonAsync(
+                new
+                {
+                    Message = exception.Message
+                });
         }
         catch (Exception)
         {

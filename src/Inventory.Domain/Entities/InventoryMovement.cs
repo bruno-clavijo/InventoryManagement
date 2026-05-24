@@ -9,5 +9,5 @@ public class InventoryMovement : BaseEntity
 
     public int Quantity { get; set; }
 
-    public InventoryMovementType MovementType { get; set; }
+    public InventoryMovementType Type { get; set; }
 }

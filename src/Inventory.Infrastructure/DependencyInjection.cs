@@ -20,7 +20,8 @@ public static class DependencyInjection
         });
         services.AddScoped<IApplicationDbContext>(provider => provider.GetRequiredService<AppDbContext>());
         services.AddScoped<IProductRepository, ProductRepository>();
-
+        services.AddScoped<ICategoryRepository, CategoryRepository>();
+        services.AddScoped<IInventoryMovementRepository, InventoryMovementRepository>();
 
         return services;
     }

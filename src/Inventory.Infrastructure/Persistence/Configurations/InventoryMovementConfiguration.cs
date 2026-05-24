@@ -15,7 +15,7 @@ public class InventoryMovementConfiguration : IEntityTypeConfiguration<Inventory
         builder.Property(movement => movement.Quantity)
             .IsRequired();
 
-        builder.Property(movement => movement.MovementType)
+        builder.Property(movement => movement.Type)
             .IsRequired();
     }
 }
