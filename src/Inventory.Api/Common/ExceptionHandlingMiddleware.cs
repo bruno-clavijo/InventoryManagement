@@ -1,6 +1,5 @@
 using FluentValidation;
 using Inventory.Application.Common.Exceptions;
-using Microsoft.AspNetCore.Http;
 using System.Net;
 using System.Text.Json;
 

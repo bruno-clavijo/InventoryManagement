@@ -13,19 +13,18 @@ public class AuthController : ControllerBase
 {
     private readonly IConfiguration _configuration;
 
-    public AuthController(
-        IConfiguration configuration)
+    public AuthController(IConfiguration configuration)
     {
         _configuration = configuration;
     }
 
+    /// <summary>
+    /// Generates Bearer Token.
+    /// </summary>
     [HttpPost("login")]
-    public IActionResult Login(
-        LoginRequest request)
+    public IActionResult Login(LoginRequest request)
     {
-        if (
-            request.Username != "admin" ||
-            request.Password != "Admin123*")
+        if (request.Username != "admin" || request.Password != "Admin123*")
         {
             return Unauthorized(
                 new
@@ -33,30 +32,16 @@ public class AuthController : ControllerBase
                     Message = "Credenciales inválidas."
                 });
         }
-
         var claims = new[]
         {
             new Claim(
                 ClaimTypes.Name,
                 request.Username)
         };
-
-        var key = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(
-                _configuration["Jwt:Key"]!));
-
-        var credentials =
-            new SigningCredentials(
-                key,
-                SecurityAlgorithms.HmacSha256);
-
-        var durationInMinutes = int.Parse(
-            _configuration[
-                "Jwt:DurationInMinutes"]!);
-
-        var expires = DateTime.UtcNow.AddMinutes(
-            durationInMinutes);
-
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]!));
+        var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var durationInMinutes = int.Parse(_configuration["Jwt:DurationInMinutes"]!);
+        var expires = DateTime.UtcNow.AddMinutes(durationInMinutes);
         var token = new JwtSecurityToken(
             issuer:
                 _configuration["Jwt:Issuer"],
@@ -65,10 +50,7 @@ public class AuthController : ControllerBase
             claims: claims,
             expires: expires,
             signingCredentials: credentials);
-
-        var jwtToken =
-            new JwtSecurityTokenHandler()
-                .WriteToken(token);
+        var jwtToken = new JwtSecurityTokenHandler().WriteToken(token);
 
         return Ok(
             new

@@ -46,7 +46,6 @@ public class CreateInventoryMovementCommandHandler
         var movementType =
             Enum.Parse<InventoryMovementType>(
                 request.Type, true);
-
         var newStock =
             movementType == InventoryMovementType.Entry
             ? product.Stock + request.Quantity
@@ -64,11 +63,9 @@ public class CreateInventoryMovementCommandHandler
                 Quantity = request.Quantity,
                 Type = Enum.Parse<InventoryMovementType>(request.Type),
             };
-
         var createdMovement =
             await _inventoryMovementRepository
                 .CreateAsync(inventoryMovement);
-
         await _inventoryMovementRepository
             .UpdateProductStockAsync(
                 product.Id,
