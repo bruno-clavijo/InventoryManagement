@@ -28,8 +28,10 @@ public class GetProductsQueryHandler
                 Name = product.Name,
                 Price = product.Price,
                 Stock = product.Stock,
-                CategoryId = product.CategoryId
+                CategoryId = product.CategoryId,
+                IsActive = product.IsActive
             })
+            .Where(product => product.IsActive)
             .ToListAsync(cancellationToken);
     }
 }

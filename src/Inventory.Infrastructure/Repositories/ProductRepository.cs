@@ -26,7 +26,8 @@ public class ProductRepository : IProductRepository
                 Price,
                 Stock,
                 CategoryId,
-                CreatedAtUtc
+                CreatedAtUtc,
+                IsActive
             )
             VALUES
             (
@@ -36,7 +37,8 @@ public class ProductRepository : IProductRepository
                 @Price,
                 @Stock,
                 @CategoryId,
-                @CreatedAtUtc
+                @CreatedAtUtc,
+                @IsActive
             )
             """;
 
@@ -44,6 +46,7 @@ public class ProductRepository : IProductRepository
             _configuration.GetConnectionString("DefaultConnection"));
         product.Id = Guid.NewGuid();
         product.CreatedAtUtc = DateTime.UtcNow;
+        product.IsActive = true;
         await connection.ExecuteAsync(sql, product);
 
         return product;
@@ -75,7 +78,8 @@ public class ProductRepository : IProductRepository
     public async Task<bool> DeleteAsync(Guid id)
     {
         const string sql = """
-            DELETE FROM Products
+            UPDATE Products
+            SET IsActive = 0
             WHERE Id = @Id
             """;
 
