@@ -6,6 +6,7 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Inventory.Domain.Enums;
 using Inventory.Application.Common.Exceptions;
+using Inventory.Domain.Exceptions;
 
 namespace Inventory.Application.InventoryMovements.Handlers;
 
@@ -70,13 +71,20 @@ public class CreateInventoryMovementCommandHandler
             await transaction.CommitAsync(
                 cancellationToken);
         }
-        catch
+        catch (DomainException ex)
         {
             await transaction.RollbackAsync(
                 cancellationToken);
 
             throw new BusinessException(
-                "Stock insuficiente para realizar el movimiento.");
+                ex.Message);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(
+                cancellationToken);
+
+            throw;
         }
 
         return new InventoryMovementDto
