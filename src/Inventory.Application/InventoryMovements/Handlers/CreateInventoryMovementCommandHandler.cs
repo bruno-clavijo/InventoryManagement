@@ -42,34 +42,29 @@ public class CreateInventoryMovementCommandHandler
         {
             throw new BusinessException("Producto no encontrado");
         }
-
         var movementType =
             Enum.Parse<InventoryMovementType>(
-                request.Type, true);
-        var newStock =
-            movementType == InventoryMovementType.Entry
-            ? product.Stock + request.Quantity
-            : product.Stock - request.Quantity;
+                request.Type,
+                true);
 
-        if (newStock < 0)
-        {
-            throw new BusinessException("Stock insuficiente");
-        }
+        product.ApplyInventoryMovement(
+            movementType,
+            request.Quantity);
 
         var inventoryMovement =
             new InventoryMovement
             {
                 ProductId = request.ProductId,
                 Quantity = request.Quantity,
-                Type = Enum.Parse<InventoryMovementType>(request.Type),
+                Type = movementType
             };
-        var createdMovement =
-            await _inventoryMovementRepository
-                .CreateAsync(inventoryMovement);
+
+        var createdMovement = await _inventoryMovementRepository.CreateAsync(inventoryMovement);
+
         await _inventoryMovementRepository
             .UpdateProductStockAsync(
                 product.Id,
-                newStock);
+                product.Stock);
 
         return new InventoryMovementDto
         {
