@@ -24,7 +24,15 @@ public class AuthController : ControllerBase
     [HttpPost("login")]
     public IActionResult Login(LoginRequest request)
     {
-        if (request.Username != "admin" || request.Password != "Admin123*")
+        var configuredUsername =
+            _configuration["Auth:Username"];
+
+        var configuredPassword =
+            _configuration["Auth:Password"];
+
+        if (
+            request.Username != configuredUsername ||
+            request.Password != configuredPassword)
         {
             return Unauthorized(
                 new
