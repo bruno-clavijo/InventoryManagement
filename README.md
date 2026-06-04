@@ -11,9 +11,11 @@ RESTful API for inventory management built with .NET 8 following Clean Architect
 - Run Application Locally
 - Swagger
 - JWT Authentication
+- Error Handling
 - Run Tests
 - Run With Docker
 - Design Patterns and Practices
+- Business Rules
 - Notes
 - Author
 
@@ -69,15 +71,18 @@ SQL Server
 
 ## Features
 
-- Product CRUD
+- Product CRUD (Soft Delete support)
 - Category CRUD
 - Inventory movements
+- Rich domain model for inventory stock management
+- Transactional inventory operations
 - JWT Authentication
 - Global exception handling
-- Validation pipeline
+- Validation pipeline with FluentValidation
 - Swagger documentation
 - Docker support
 - Unit testing
+- Structured application logging
 
 ---
 
@@ -162,24 +167,42 @@ http://localhost:5098/swagger
 POST /api/auth/login
 ```
 
-### Credentials
-
-```json
-{
-  "username": "admin",
-  "password": "Admin123*"
-}
-```
+v
 
 Use returned JWT token in Swagger Authorize button.
 
 ---
 
+## Error Handling
+
+The API uses centralized exception handling middleware.
+
+### HTTP Status Codes
+
+| Status | Description             |
+| ------ | ----------------------- |
+| 200    | Successful operation    |
+| 201    | Resource created        |
+| 400    | Validation errors       |
+| 401    | Unauthorized            |
+| 404    | Resource not found      |
+| 422    | Business rule violation |
+| 500    | Unexpected server error |
+
+---
+
 ## Run Tests
 
-```bash
+Unit tests cover:
+
+- Product validation rules
+- Inventory movement creation
+- Product not found scenarios
+- Insufficient stock scenarios
+- Successful inventory transactions
+
+````bash
 dotnet test
-```
 
 ---
 
@@ -189,7 +212,7 @@ dotnet test
 
 ```bash
 git clone https://github.com/bruno-clavijo/InventoryManagement.git
-```
+````
 
 ### 2. Navigate to project
 
@@ -255,8 +278,28 @@ InventoryDbPassword123*
 - Dependency Injection
 - SOLID Principles
 - Clean Code
+- Rich Domain Model
+- Domain Exceptions
 - Global Exception Handling
 - Validation Pipeline Behavior
+- Transaction Management
+- Soft Delete Pattern
+
+---
+
+## Business Rules
+
+### Inventory Movements
+
+- Entry movements increase product stock.
+- Exit movements decrease product stock.
+- Exit movements cannot exceed available stock.
+- Quantities must be greater than zero.
+
+### Product Management
+
+- Products are soft deleted using the IsActive flag.
+- Inactive products are excluded from application queries.
 
 ---
 
