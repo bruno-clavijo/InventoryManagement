@@ -1,6 +1,7 @@
 using Inventory.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Inventory.Application.Interfaces;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Inventory.Infrastructure.Persistence.Contexts;
 
@@ -24,5 +25,14 @@ public class AppDbContext
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AppDbContext).Assembly);
 
         base.OnModelCreating(modelBuilder);
+    }
+
+    public async Task<IDbContextTransaction>
+        BeginTransactionAsync(
+            CancellationToken cancellationToken)
+    {
+        return await Database
+            .BeginTransactionAsync(
+                cancellationToken);
     }
 }

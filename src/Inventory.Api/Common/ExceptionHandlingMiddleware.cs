@@ -2,6 +2,7 @@ using FluentValidation;
 using Inventory.Application.Common.Exceptions;
 using System.Net;
 using System.Text.Json;
+using Inventory.Domain.Exceptions;
 
 namespace Inventory.Api.Common.Exceptions;
 
@@ -40,7 +41,18 @@ public class ExceptionHandlingMiddleware
         }
         catch (BusinessException exception)
         {
-            context.Response.StatusCode = 400;
+            context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
+
+            await context.Response.WriteAsJsonAsync(
+                new
+                {
+                    Message = exception.Message
+                });
+        }
+        catch (DomainException exception)
+        {
+            context.Response.ContentType = "application/json";
+            context.Response.StatusCode = StatusCodes.Status422UnprocessableEntity;
 
             await context.Response.WriteAsJsonAsync(
                 new

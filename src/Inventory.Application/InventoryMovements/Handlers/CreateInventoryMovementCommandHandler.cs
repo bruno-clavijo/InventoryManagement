@@ -16,17 +16,10 @@ public class CreateInventoryMovementCommandHandler
 {
     private readonly IApplicationDbContext _context;
 
-    private readonly IInventoryMovementRepository
-        _inventoryMovementRepository;
-
     public CreateInventoryMovementCommandHandler(
-        IApplicationDbContext context,
-        IInventoryMovementRepository inventoryMovementRepository)
+    IApplicationDbContext context)
     {
         _context = context;
-
-        _inventoryMovementRepository =
-            inventoryMovementRepository;
     }
 
     public async Task<InventoryMovementDto> Handle(
@@ -42,38 +35,58 @@ public class CreateInventoryMovementCommandHandler
         {
             throw new BusinessException("Producto no encontrado");
         }
+
         var movementType =
             Enum.Parse<InventoryMovementType>(
                 request.Type,
                 true);
 
-        product.ApplyInventoryMovement(
-            movementType,
-            request.Quantity);
-
         var inventoryMovement =
             new InventoryMovement
             {
+                Id = Guid.NewGuid(),
                 ProductId = request.ProductId,
                 Quantity = request.Quantity,
-                Type = movementType
+                Type = movementType,
+                CreatedAtUtc = DateTime.UtcNow
             };
 
-        var createdMovement = await _inventoryMovementRepository.CreateAsync(inventoryMovement);
+        await using var transaction =
+            await _context.BeginTransactionAsync(
+                cancellationToken);
 
-        await _inventoryMovementRepository
-            .UpdateProductStockAsync(
-                product.Id,
-                product.Stock);
+        try
+        {
+            product.ApplyInventoryMovement(
+                movementType,
+                request.Quantity);
+
+            _context.InventoryMovements
+                .Add(inventoryMovement);
+
+            await _context.SaveChangesAsync(
+                cancellationToken);
+
+            await transaction.CommitAsync(
+                cancellationToken);
+        }
+        catch
+        {
+            await transaction.RollbackAsync(
+                cancellationToken);
+
+            throw new BusinessException(
+                "Stock insuficiente para realizar el movimiento.");
+        }
 
         return new InventoryMovementDto
         {
-            Id = createdMovement.Id,
-            ProductId = createdMovement.ProductId,
-            Quantity = createdMovement.Quantity,
-            Type = createdMovement.Type.ToString(),
+            Id = inventoryMovement.Id,
+            ProductId = inventoryMovement.ProductId,
+            Quantity = inventoryMovement.Quantity,
+            Type = inventoryMovement.Type.ToString(),
             CreatedAtUtc =
-                createdMovement.CreatedAtUtc
+                inventoryMovement.CreatedAtUtc
         };
     }
 }
